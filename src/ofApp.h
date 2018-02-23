@@ -23,9 +23,11 @@ public:
   ftDrawMouseForces mouseForces;
   float deltaTime;
   float lastTime;
-  int drawStar;
 
 private:
   ros::NodeHandle n;
   ros::Subscriber scan_sub;
+  int drawStar;
+  double level_center;
+  double level_left;
 };

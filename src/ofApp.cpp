@@ -23,12 +23,16 @@ void ofApp::scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 
   double center_number = (-msg->angle_min)/msg->angle_increment;
   double center = msg->ranges[center_number];
+  double left = msg->ranges[center_number+128];
 
   center = null_check(center);
+  left = null_check(left);
   
-  if(center < 0.5){
+  if(center < 0.5 || left < 0.5){
     ROS_INFO("Drawing");
     drawStar = 1;
+    if(center < 0.5) level_center = center * 1000;
+    if(left < 0.5) level_left = left * 1000;
   }else{
     drawStar = 0;
   }
@@ -57,11 +61,11 @@ void ofApp::draw(){
   if(drawStar){
     ofSetPolyMode(OF_POLY_WINDING_NONZERO);
     ofBeginShape();
-    ofVertex(200,135);
-    ofVertex(15,135);
-    ofVertex(165,25);
-    ofVertex(105,200);
-    ofVertex(50,25);
+    ofVertex(200+level_center,135+level_left);
+    ofVertex(15+level_center,135+level_left);
+    ofVertex(165+level_center,25+level_left);
+    ofVertex(105+level_center,200+level_left);
+    ofVertex(50+level_center,25+level_left);
     ofEndShape();
   }
 }
