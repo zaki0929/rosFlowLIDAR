@@ -15,6 +15,8 @@ public:
   void draw();
   
   void scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
+  void drawStar();
+  void drawWave();
 
   void keyPressed(int key);
   void keyReleased(int key);
@@ -27,7 +29,8 @@ public:
 private:
   ros::NodeHandle n;
   ros::Subscriber scan_sub;
-  int drawStar;
+  int drawStar_allow;
   double level_center;
   double level_left;
+  double scanValues[726];
 };
