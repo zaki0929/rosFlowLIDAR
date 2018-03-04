@@ -5,6 +5,7 @@
 #include "ofxGui.h"
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
+#include <cmath>
 
 using namespace flowTools;
 
@@ -19,6 +20,8 @@ public:
   void drawStar();
   void drawWave();
   void drawFluid();
+  void drawSun();
+  void drawSnow();
 
   ofxIntSlider mode;
   ofxPanel gui;

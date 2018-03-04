@@ -2,6 +2,8 @@
 #define RANGE_MAX 5.6
 #define VALID_MIN 44
 #define VALID_MAX 725
+#define ANGLE_DIFF 0.00613592315153
+#define INITIAL_ANGLE 2.618 
 
 void ofApp::setup(){
   scan_sub = n.subscribe("scan", 1000, &ofApp::scanCallback, this);
@@ -15,7 +17,7 @@ void ofApp::setup(){
   lastTime = ofGetElapsedTimef();
 
   gui.setup();
-  gui.add(mode.setup("mode", 0, 0, 2));
+  gui.add(mode.setup("mode", 3, 0, 4));
 }
 
 double null_check(double target){
@@ -76,15 +78,23 @@ void ofApp::draw(){
   //fluidSimulation.draw(0,0,1280,720);
   switch(mode){
     case 0:
-      drawStar();
+      drawFluid();
       break;
 
     case 1:
-      drawWave();
+      drawStar();
       break;
 
     case 2:
-      drawFluid();
+      drawWave();
+      break;
+
+    case 3:
+      drawSun();
+      break;
+
+    case 4:
+      drawSnow();
       break;
   }
   gui.draw();
@@ -118,6 +128,29 @@ void ofApp::drawFluid(){
   if(drawFluid_allow){
     fluidSimulation.draw(0,0,1280,720);
   }
+}
+
+void ofApp::drawSun(){
+  double angle = INITIAL_ANGLE;
+  ofSetPolyMode(OF_POLY_WINDING_NONZERO);
+  ofBeginShape();
+  ofVertex(640, 360);
+  for(int i=VALID_MIN; i<=VALID_MAX; i++){
+    ofVertex(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360);
+    angle += ANGLE_DIFF;
+  }
+  ofVertex(640, 360);
+  angle = INITIAL_ANGLE;
+  ofEndShape();
+}
+
+void ofApp::drawSnow(){
+  double angle = INITIAL_ANGLE;
+  for(int i=VALID_MIN; i<=VALID_MAX; i++){
+    ofDrawCircle(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360, 0.5);
+    angle += ANGLE_DIFF;
+  }
+  angle = INITIAL_ANGLE;
 }
 
 //--------------------------------------------------------------
