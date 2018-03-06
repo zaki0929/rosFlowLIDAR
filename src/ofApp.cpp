@@ -1,8 +1,9 @@
 #include "ofApp.h"
+
+//Definition for using URG-04LX-UG01.
 #define RANGE_MAX 5.6
 #define VALID_MIN 44
 #define VALID_MAX 725
-#define ANGLE_DIFF 0.00613592315153
 #define INITIAL_ANGLE 2.618 
 
 void ofApp::setup(){
@@ -30,11 +31,14 @@ double null_check(double target){
 
 void ofApp::scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
   double center_number = (-msg->angle_min)/msg->angle_increment;
-  double center = msg->ranges[center_number];
-  double left = msg->ranges[center_number+128];
+  double center = null_check(msg->ranges[center_number]);
+  double left = null_check(msg->ranges[center_number+128]);
 
-  center = null_check(center);
-  left = null_check(left);
+  angle_diff = msg->angle_increment;
+  
+  for(int i=0; i<msg->ranges.size(); i++){
+    scanValues[i] = null_check(msg->ranges[i]);
+  }
 
   //For draw the star.
   if(center < 0.5 || left < 0.5){
@@ -43,11 +47,6 @@ void ofApp::scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
     if(left < 0.5) level_left = left * 1000;
   }else{
     drawStar_allow = 0;
-  }
-
-  //For draw the wave.
-  for(int i=0; i<msg->ranges.size(); i++){
-    scanValues[i] = null_check(msg->ranges[i]);
   }
 
   //For draw the fluid.
@@ -137,10 +136,9 @@ void ofApp::drawSun(){
   ofVertex(640, 360);
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
     ofVertex(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360);
-    angle += ANGLE_DIFF;
+    angle += angle_diff;
   }
   ofVertex(640, 360);
-  angle = INITIAL_ANGLE;
   ofEndShape();
 }
 
@@ -148,9 +146,8 @@ void ofApp::drawSnow(){
   double angle = INITIAL_ANGLE;
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
     ofDrawCircle(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360, 0.5);
-    angle += ANGLE_DIFF;
+    angle += angle_diff;
   }
-  angle = INITIAL_ANGLE;
 }
 
 //--------------------------------------------------------------

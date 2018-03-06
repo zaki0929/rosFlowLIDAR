@@ -42,4 +42,5 @@ private:
   double level_center;
   double level_left;
   double scanValues[726];
+  double angle_diff;
 };
