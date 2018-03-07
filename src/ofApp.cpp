@@ -18,7 +18,11 @@ void ofApp::setup(){
   lastTime = ofGetElapsedTimef();
 
   gui.setup();
-  gui.add(mode.setup("mode", 3, 0, 4));
+  gui.add(mode.setup("Mode", 3, 0, 4));
+
+  gui2.setup();
+  gui2.setPosition(10, 60);
+  gui2.add(rotate180.setup("Rotate 180 degrees", 0, 0, 1));
 }
 
 double null_check(double target){
@@ -89,10 +93,12 @@ void ofApp::draw(){
       break;
 
     case 3:
+      gui2.draw();
       drawSun();
       break;
 
     case 4:
+      gui2.draw();
       drawSnow();
       break;
   }
@@ -131,6 +137,9 @@ void ofApp::drawFluid(){
 
 void ofApp::drawSun(){
   double angle = INITIAL_ANGLE;
+  if(rotate180){
+    angle = INITIAL_ANGLE + M_PI;
+  }
   ofSetPolyMode(OF_POLY_WINDING_NONZERO);
   ofBeginShape();
   ofVertex(640, 360);
@@ -144,6 +153,9 @@ void ofApp::drawSun(){
 
 void ofApp::drawSnow(){
   double angle = INITIAL_ANGLE;
+  if(rotate180){
+    angle = INITIAL_ANGLE + M_PI;
+  }
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
     ofDrawCircle(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360, 0.5);
     angle += angle_diff;

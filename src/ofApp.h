@@ -24,7 +24,10 @@ public:
   void drawSnow();
 
   ofxIntSlider mode;
+  ofxIntSlider rotate180;
+
   ofxPanel gui;
+  ofxPanel gui2;
 
   void keyPressed(int key);
   void keyReleased(int key);
