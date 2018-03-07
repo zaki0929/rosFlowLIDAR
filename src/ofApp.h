@@ -17,11 +17,12 @@ public:
   void draw();
   
   void scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
+  void drawFluid();
   void drawStar();
   void drawWave();
-  void drawFluid();
   void drawSun();
   void drawSnow();
+  void drawFirefly();
 
   ofxIntSlider mode;
   ofxIntSlider rotate180;
@@ -41,9 +42,10 @@ private:
   ros::NodeHandle n;
   ros::Subscriber scan_sub;
   int drawStar_allow;
-  int drawFluid_allow;
   double level_center;
   double level_left;
   double scanValues[726];
   double angle_diff;
+  double center;
+  double left;
 };

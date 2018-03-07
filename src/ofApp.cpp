@@ -10,6 +10,7 @@ void ofApp::setup(){
   scan_sub = n.subscribe("scan", 1000, &ofApp::scanCallback, this);
   ofBackground(0, 0, 0);
   ofSetWindowShape(1280, 720);
+  ofSetBackgroundAuto(false);
 
   fluidSimulation.setup(ofGetWidth(), ofGetHeight());
   fluidSimulation.setDissipation(0.0);
@@ -18,7 +19,7 @@ void ofApp::setup(){
   lastTime = ofGetElapsedTimef();
 
   gui.setup();
-  gui.add(mode.setup("Mode", 3, 0, 4));
+  gui.add(mode.setup("Mode", 5, 0, 5));
 
   gui2.setup();
   gui2.setPosition(10, 60);
@@ -35,29 +36,13 @@ double null_check(double target){
 
 void ofApp::scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
   double center_number = (-msg->angle_min)/msg->angle_increment;
-  double center = null_check(msg->ranges[center_number]);
-  double left = null_check(msg->ranges[center_number+128]);
 
+  center = null_check(msg->ranges[center_number]);
+  left = null_check(msg->ranges[center_number+128]);
   angle_diff = msg->angle_increment;
   
   for(int i=0; i<msg->ranges.size(); i++){
     scanValues[i] = null_check(msg->ranges[i]);
-  }
-
-  //For draw the star.
-  if(center < 0.5 || left < 0.5){
-    drawStar_allow = 1;
-    if(center < 0.5) level_center = center * 1000;
-    if(left < 0.5) level_left = left * 1000;
-  }else{
-    drawStar_allow = 0;
-  }
-
-  //For draw the fluid.
-  if(center < 0.5){
-    drawFluid_allow = 1;
-  }else{
-    drawFluid_allow = 0;
   }
 }
 
@@ -73,40 +58,34 @@ void ofApp::update(){
     }
   }
   fluidSimulation.update();
-  
   ros::spinOnce();
 }
 
 void ofApp::draw(){
-  //fluidSimulation.draw(0,0,1280,720);
+  ofSetColor(0, 0, 0, 30);
+  ofRect(0, 0, ofGetWidth(), ofGetHeight());
+  ofSetColor(255, 255, 255, 60);
   switch(mode){
-    case 0:
-      drawFluid();
-      break;
-
-    case 1:
-      drawStar();
-      break;
-
-    case 2:
-      drawWave();
-      break;
-
-    case 3:
-      gui2.draw();
-      drawSun();
-      break;
-
-    case 4:
-      gui2.draw();
-      drawSnow();
-      break;
+    case 0: drawFluid(); break;
+    case 1: drawStar(); break;
+    case 2: drawWave(); break;
+    case 3: drawSun(); gui2.draw(); break;
+    case 4: drawSnow(); gui2.draw(); break;
+    case 5: drawFirefly(); gui2.draw(); break;
   }
   gui.draw();
 }
 
+void ofApp::drawFluid(){
+  if(center < 0.2){
+    fluidSimulation.draw(0,0,1280,720);
+  }
+}
+
 void ofApp::drawStar(){
-  if(drawStar_allow){
+  if(center < 0.5 || left < 0.5){
+    if(center < 0.5) level_center = center * 1000;
+    if(left < 0.5) level_left = left * 1000;
     ofSetPolyMode(OF_POLY_WINDING_NONZERO);
     ofBeginShape();
     ofVertex(200+level_center,135+level_left);
@@ -121,18 +100,12 @@ void ofApp::drawStar(){
 void ofApp::drawWave(){
   ofSetPolyMode(OF_POLY_WINDING_NONZERO);
   ofBeginShape();
-  ofVertex(VALID_MIN, RANGE_MAX*100);
+  ofVertex(VALID_MIN+280, RANGE_MAX*100+80);
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
-    ofVertex(i, scanValues[i]*100);
+    ofVertex(i+280, scanValues[i]*100+80);
   }
-  ofVertex(VALID_MAX, RANGE_MAX*100);
+  ofVertex(VALID_MAX+280, RANGE_MAX*100+80);
   ofEndShape();
-}
-
-void ofApp::drawFluid(){
-  if(drawFluid_allow){
-    fluidSimulation.draw(0,0,1280,720);
-  }
 }
 
 void ofApp::drawSun(){
@@ -153,6 +126,7 @@ void ofApp::drawSun(){
 
 void ofApp::drawSnow(){
   double angle = INITIAL_ANGLE;
+
   if(rotate180){
     angle = INITIAL_ANGLE + M_PI;
   }
@@ -160,6 +134,26 @@ void ofApp::drawSnow(){
     ofDrawCircle(scanValues[i]*std::cos(angle)*60+640, -scanValues[i]*std::sin(angle)*60+360, 0.5);
     angle += angle_diff;
   }
+}
+
+void ofApp::drawFirefly(){
+  double min_value = RANGE_MAX;
+  int min_i = VALID_MIN;
+  double angle = INITIAL_ANGLE;
+
+  if(rotate180){
+    angle = INITIAL_ANGLE + M_PI;
+  }
+  for(int i=VALID_MIN; i<=VALID_MAX; i++){
+    if(min_value > scanValues[i] && scanValues[i] > 0.1){
+      min_value = scanValues[i];
+      min_i = i;
+    }
+  }
+  for(int i=VALID_MIN; i<min_i; i++){
+    angle += angle_diff;
+  }
+  ofDrawCircle(scanValues[min_i]*std::cos(angle)*1000+640, -scanValues[min_i]*std::sin(angle)*1000+360, 20);
 }
 
 //--------------------------------------------------------------
