@@ -20,9 +20,10 @@ void ofApp::setup(){
 
   gui.setup();
   gui.add(mode.setup("Mode", 5, 0, 5));
+  gui.add(draw_trajectory.setup("Draw the trajectory", 1, 0, 1));
 
   gui2.setup();
-  gui2.setPosition(10, 60);
+  gui2.setPosition(10, 90);
   gui2.add(rotate180.setup("Rotate 180 degrees", 0, 0, 1));
 }
 
@@ -62,15 +63,19 @@ void ofApp::update(){
 }
 
 void ofApp::draw(){
-  ofSetColor(0, 0, 0, 30);
+  if(draw_trajectory){
+    ofSetColor(0, 0, 0, 30);
+  }else{
+    ofSetColor(0, 0, 0, 255);
+  }
   ofRect(0, 0, ofGetWidth(), ofGetHeight());
-  ofSetColor(255, 255, 255, 60);
+  ofSetColor(255, 255, 255, 255);
   switch(mode){
     case 0: drawFluid(); break;
     case 1: drawStar(); break;
     case 2: drawWave(); break;
     case 3: drawSun(); gui2.draw(); break;
-    case 4: drawSnow(); gui2.draw(); break;
+    case 4: drawConstellation(); gui2.draw(); break;
     case 5: drawFirefly(); gui2.draw(); break;
   }
   gui.draw();
@@ -124,7 +129,7 @@ void ofApp::drawSun(){
   ofEndShape();
 }
 
-void ofApp::drawSnow(){
+void ofApp::drawConstellation(){
   double angle = INITIAL_ANGLE;
 
   if(rotate180){

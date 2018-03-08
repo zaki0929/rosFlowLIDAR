@@ -21,10 +21,11 @@ public:
   void drawStar();
   void drawWave();
   void drawSun();
-  void drawSnow();
+  void drawConstellation();
   void drawFirefly();
 
   ofxIntSlider mode;
+  ofxIntSlider draw_trajectory;
   ofxIntSlider rotate180;
 
   ofxPanel gui;
