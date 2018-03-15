@@ -19,13 +19,23 @@ void ofApp::setup(){
   lastTime = ofGetElapsedTimef();
 
   gui.setup();
-  gui.add(mode.setup("Mode", 5, 0, 5));
+  gui.add(mode.setup("Mode", 6, 0, 6));
   gui.add(toggleTrajectoryDraw.setup("Draw the trajectory", 1, 0, 1));
   gui.add(alpha.setup("Alpha", 255, 0, 255));
 
   gui2.setup();
   gui2.setPosition(10, 90);
   gui2.add(toggleRotate180.setup("Rotate 180 degrees", 0, 0, 1));
+
+  gui3.setup();
+  gui3.setPosition(10, 90);
+  gui3.add(xCam.setup("The x coordinate", 300, 0, 800));
+  gui3.add(yCam.setup("The y coordinate", 600, 0, 800));
+  gui3.add(zCam.setup("The z coordinate", 200, 0, 800));
+
+  cam.setDistance(800);
+  cam.setPosition(ofVec3f(xCam, yCam, zCam));
+  depth = 0;
 }
 
 double null_check(double target){
@@ -78,6 +88,7 @@ void ofApp::draw(){
     case 3: drawSun(); gui2.draw(); break;
     case 4: drawConstellation(); gui2.draw(); break;
     case 5: drawFirefly(); gui2.draw(); break;
+    case 6: drawTerrain(); gui3.draw(); break;
   }
   gui.draw();
 }
@@ -161,6 +172,20 @@ void ofApp::drawFirefly(){
   }
   ofDrawCircle(scanValues[min_i]*std::cos(angle)*1000+640, -scanValues[min_i]*std::sin(angle)*1000+360, 20);
 }
+
+void ofApp::drawTerrain(){
+  mesh.addVertex(ofVec3f(VALID_MIN, RANGE_MAX*100, -depth));
+  for(int i=VALID_MIN; i<=VALID_MAX; i++){
+   mesh.addVertex(ofVec3f(i, scanValues[i]*100, -depth));
+   cam.setPosition(ofVec3f(xCam, yCam, zCam-depth));
+   depth += 0.001;
+  }
+  mesh.addVertex(ofVec3f(VALID_MAX, RANGE_MAX*100, -depth));
+  cam.begin();
+  mesh.draw();
+  cam.end();
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){

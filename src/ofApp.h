@@ -23,14 +23,23 @@ public:
   void drawSun();
   void drawConstellation();
   void drawFirefly();
+  void drawTerrain();
 
   ofxIntSlider mode;
   ofxIntSlider alpha;
+  ofxIntSlider xCam;
+  ofxIntSlider yCam;
+  ofxIntSlider zCam;
   ofxIntSlider toggleTrajectoryDraw;
   ofxIntSlider toggleRotate180;
 
   ofxPanel gui;
   ofxPanel gui2;
+  ofxPanel gui3;
+
+  ofMesh mesh;
+
+  ofEasyCam cam;
 
   void keyPressed(int key);
   void keyReleased(int key);
@@ -50,4 +59,5 @@ private:
   double angle_diff;
   double center;
   double left;
+  double depth;
 };
