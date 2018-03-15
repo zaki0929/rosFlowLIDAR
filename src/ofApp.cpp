@@ -20,11 +20,12 @@ void ofApp::setup(){
 
   gui.setup();
   gui.add(mode.setup("Mode", 5, 0, 5));
-  gui.add(draw_trajectory.setup("Draw the trajectory", 1, 0, 1));
+  gui.add(toggleTrajectoryDraw.setup("Draw the trajectory", 1, 0, 1));
+  gui.add(alpha.setup("Alpha", 255, 0, 255));
 
   gui2.setup();
   gui2.setPosition(10, 90);
-  gui2.add(rotate180.setup("Rotate 180 degrees", 0, 0, 1));
+  gui2.add(toggleRotate180.setup("Rotate 180 degrees", 0, 0, 1));
 }
 
 double null_check(double target){
@@ -63,13 +64,13 @@ void ofApp::update(){
 }
 
 void ofApp::draw(){
-  if(draw_trajectory){
+  if(toggleTrajectoryDraw){
     ofSetColor(0, 0, 0, 30);
   }else{
     ofSetColor(0, 0, 0, 255);
   }
   ofRect(0, 0, ofGetWidth(), ofGetHeight());
-  ofSetColor(255, 255, 255, 255);
+  ofSetColor(255, 255, 255, alpha);
   switch(mode){
     case 0: drawFluid(); break;
     case 1: drawStar(); break;
@@ -115,7 +116,7 @@ void ofApp::drawWave(){
 
 void ofApp::drawSun(){
   double angle = INITIAL_ANGLE;
-  if(rotate180){
+  if(toggleRotate180){
     angle = INITIAL_ANGLE + M_PI;
   }
   ofSetPolyMode(OF_POLY_WINDING_NONZERO);
@@ -132,7 +133,7 @@ void ofApp::drawSun(){
 void ofApp::drawConstellation(){
   double angle = INITIAL_ANGLE;
 
-  if(rotate180){
+  if(toggleRotate180){
     angle = INITIAL_ANGLE + M_PI;
   }
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
@@ -146,7 +147,7 @@ void ofApp::drawFirefly(){
   int min_i = VALID_MIN;
   double angle = INITIAL_ANGLE;
 
-  if(rotate180){
+  if(toggleRotate180){
     angle = INITIAL_ANGLE + M_PI;
   }
   for(int i=VALID_MIN; i<=VALID_MAX; i++){

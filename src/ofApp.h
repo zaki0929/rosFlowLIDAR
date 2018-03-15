@@ -25,8 +25,9 @@ public:
   void drawFirefly();
 
   ofxIntSlider mode;
-  ofxIntSlider draw_trajectory;
-  ofxIntSlider rotate180;
+  ofxIntSlider alpha;
+  ofxIntSlider toggleTrajectoryDraw;
+  ofxIntSlider toggleRotate180;
 
   ofxPanel gui;
   ofxPanel gui2;
