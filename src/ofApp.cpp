@@ -30,8 +30,9 @@ void ofApp::setup(){
   gui3.setup();
   gui3.setPosition(10, 90);
   gui3.add(xCam.setup("The x coordinate", 300, 0, 800));
-  gui3.add(yCam.setup("The y coordinate", 600, 0, 800));
+  gui3.add(yCam.setup("The y coordinate", 200, 0, 800));
   gui3.add(zCam.setup("The z coordinate", 200, 0, 800));
+  gui3.add(interval.setup("Interval length", 1, 0, 20));
 
   cam.setDistance(800);
   cam.setPosition(ofVec3f(xCam, yCam, zCam));
@@ -178,7 +179,7 @@ void ofApp::drawTerrain(){
   for(int i=VALID_MIN; i<=VALID_MAX; i++){
    mesh.addVertex(ofVec3f(i, scanValues[i]*100, -depth));
    cam.setPosition(ofVec3f(xCam, yCam, zCam-depth));
-   depth += 0.001;
+   depth += interval*0.001;
   }
   mesh.addVertex(ofVec3f(VALID_MAX, RANGE_MAX*100, -depth));
   cam.begin();

@@ -30,6 +30,7 @@ public:
   ofxIntSlider xCam;
   ofxIntSlider yCam;
   ofxIntSlider zCam;
+  ofxIntSlider interval;
   ofxIntSlider toggleTrajectoryDraw;
   ofxIntSlider toggleRotate180;
 
