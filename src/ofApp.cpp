@@ -21,14 +21,15 @@ void ofApp::setup(){
   gui.setup();
   gui.add(mode.setup("Mode", 6, 0, 6));
   gui.add(toggleTrajectoryDraw.setup("Draw the trajectory", 1, 0, 1));
+  gui.add(toggleGlitchDraw.setup("Draw the glitch", 1, 0, 1));
   gui.add(alpha.setup("Alpha", 255, 0, 255));
 
   gui2.setup();
-  gui2.setPosition(10, 90);
+  gui2.setPosition(10, 120);
   gui2.add(toggleRotate180.setup("Rotate 180 degrees", 0, 0, 1));
 
   gui3.setup();
-  gui3.setPosition(10, 90);
+  gui3.setPosition(10, 120);
   gui3.add(xCam.setup("The x coordinate", 300, 0, 800));
   gui3.add(yCam.setup("The y coordinate", 200, 0, 800));
   gui3.add(zCam.setup("The z coordinate", 200, 0, 800));
@@ -37,6 +38,9 @@ void ofApp::setup(){
   cam.setDistance(800);
   cam.setPosition(ofVec3f(xCam, yCam, zCam));
   depth = 0;
+
+  myFbo.allocate(1280, 720);
+  myGlitch.setup(&myFbo);
 }
 
 double null_check(double target){
@@ -60,21 +64,26 @@ void ofApp::scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 }
 
 void ofApp::update(){
-  deltaTime = ofGetElapsedTimef()-lastTime;
-  lastTime = ofGetElapsedTimef();
-  mouseForces.update(deltaTime);
-
-  for (int i=0; i<mouseForces.getNumForces(); i++) {
-    if(mouseForces.didChange(i)){
-      fluidSimulation.addDensity(mouseForces.getTextureReference(i),mouseForces.getStrength(i));
-      fluidSimulation.addVelocity(mouseForces.getTextureReference(i),mouseForces.getStrength(i));
-    }
+  switch(mode){
+    case 0: updateFluid(); break;
   }
-  fluidSimulation.update();
   ros::spinOnce();
+
+  myFbo.begin();
+  mainDraw();
+  myFbo.end();
 }
 
 void ofApp::draw(){
+  if(toggleGlitchDraw){
+    myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE,true);
+    myGlitch.generateFx();
+  }
+  myFbo.draw(0,0);
+  drawGui();
+}
+
+void ofApp::mainDraw(){
   if(toggleTrajectoryDraw){
     ofSetColor(0, 0, 0, 30);
   }else{
@@ -86,12 +95,37 @@ void ofApp::draw(){
     case 0: drawFluid(); break;
     case 1: drawStar(); break;
     case 2: drawWave(); break;
-    case 3: drawSun(); gui2.draw(); break;
-    case 4: drawConstellation(); gui2.draw(); break;
-    case 5: drawFirefly(); gui2.draw(); break;
-    case 6: drawTerrain(); gui3.draw(); break;
+    case 3: drawSun(); break;
+    case 4: drawConstellation(); break;
+    case 5: drawFirefly(); break;
+    case 6: drawTerrain(); break;
   }
-  gui.draw();
+}
+
+void ofApp::updateFluid(){
+  deltaTime = ofGetElapsedTimef()-lastTime;
+  lastTime = ofGetElapsedTimef();
+  mouseForces.update(deltaTime);
+
+  for (int i=0; i<mouseForces.getNumForces(); i++) {
+    if(mouseForces.didChange(i)){
+      fluidSimulation.addDensity(mouseForces.getTextureReference(i),mouseForces.getStrength(i));
+      fluidSimulation.addVelocity(mouseForces.getTextureReference(i),mouseForces.getStrength(i));
+    }
+  }
+  fluidSimulation.update();
+}
+
+void ofApp::drawGui(){
+  switch(mode){
+    case 0: gui.draw(); break;
+    case 1: gui.draw(); break;
+    case 2: gui.draw(); break;
+    case 3: gui.draw(); gui2.draw(); break;
+    case 4: gui.draw(); gui2.draw(); break;
+    case 5: gui.draw(); gui2.draw(); break;
+    case 6: gui.draw(); gui3.draw(); break;
+  }
 }
 
 void ofApp::drawFluid(){
