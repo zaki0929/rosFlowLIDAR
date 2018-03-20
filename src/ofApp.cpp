@@ -19,6 +19,7 @@ void ofApp::setup(){
   lastTime = ofGetElapsedTimef();
 
   gui.setup();
+  gui.setPosition(10, 10);
   gui.add(mode.setup("Mode", 6, 0, 6));
   gui.add(toggleTrajectoryDraw.setup("Draw the trajectory", 1, 0, 1));
   gui.add(toggleGlitchDraw.setup("Draw the glitch", 1, 0, 1));
@@ -81,6 +82,7 @@ void ofApp::draw(){
   }
   myFbo.draw(0,0);
   drawGui();
+  ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", 20, 24);
 }
 
 void ofApp::mainDraw(){
